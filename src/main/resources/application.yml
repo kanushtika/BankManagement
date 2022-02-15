@@ -1,0 +1,32 @@
+eureka:
+  client:
+    enabled: false
+  serviceUrl:
+    registerWithEureka: false
+
+server:
+  port: 8090
+    
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:mariadb://localhost:3309/bankmanagement?useUnicode=true
+    username: root
+    password: root
+    driver-class-name: org.mariadb.jdbc.Driver
+  main:
+    banner-mode: off
+    allow-circular-references: true
+  application: 
+    name: bank-management  
+
+        
+logging:
+  level: 
+    root: DEBUG
+    
+
+    
+
+  

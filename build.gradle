@@ -1,0 +1,93 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.3'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id "org.flywaydb.flyway" version "7.7.3"
+	id "nu.studer.jooq" version "4.2"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-jooq'
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.flywaydb:flyway-core'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+}
+flyway {
+    url = 'jdbc:mariadb://localhost:3309'
+    user = 'root'
+    password = 'root'
+    schemas = ['bankmanagement']
+}
+def generatedDir = 'src/main/generated'
+sourceSets {
+    main {
+        java {
+            srcDirs += [generatedDir]
+        }
+    }
+}
+clean.doLast {
+   project.file(generatedDir).deleteDir()
+}
+jooq {
+	dependencies { jooqRuntime 'org.mariadb.jdbc:mariadb-java-client:2.6.0' }
+    sample(sourceSets.main) {
+        jdbc {
+            driver = 'org.mariadb.jdbc.Driver'
+            url = 'jdbc:mariadb://localhost:3309'
+            user = 'root'
+            password = 'root'
+			schema = 'bankmanagement'
+        }
+        generator {
+            name = 'org.jooq.codegen.DefaultGenerator'
+            database {
+                name = 'org.jooq.meta.mariadb.MariaDBDatabase'
+                includes = '.*'
+                excludes = ''
+				unsignedTypes = false
+				integerDisplayWidths=false
+				forcedTypes{
+                	forcedType{
+                		name="BOOLEAN"
+                		types="TINYINT"
+                	}
+                	forcedType{
+                		name="INTEGER"
+                		types="SMALLINT"
+                	}
+                }
+            }
+            target {
+				packageName ='com.example.bankManagement.generated'
+				directory = generatedDir
+            }
+        }
+    }
+}
+
+generateSampleJooqSchemaSource.dependsOn clean
+project.tasks.getByName('compileJava').dependsOn -= 'generateSampleJooqSchemaSource'
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
