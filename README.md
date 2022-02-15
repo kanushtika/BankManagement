@@ -1,6 +1,6 @@
 # BankManagement
 
 # Technologies Used
-Backend :- Spring Boot
-Database :- MariaDB
-Database-migration- Flyway
+- Backend :- Spring Boot
+- Database :- MariaDB
+- Database-migration- Flyway
